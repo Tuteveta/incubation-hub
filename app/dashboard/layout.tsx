@@ -1,10 +1,13 @@
 // app/dashboard/layout.tsx
 "use client";
 
-import Providers from "../providers/Providers"; // keep this path if Providers is at app/providers
-import { Sidebar } from "../layout/Sidebar";     // adjust paths if needed
+export const dynamic = "force-dynamic"; // prevents static prerendering
+
+import Providers from "../providers/Providers";
+import { Sidebar } from "../layout/Sidebar"; // adjust path if different
 import { Topbar } from "../layout/Topbar";
 import { cn } from "@/lib/utils";
+import "./dashboard.css"; // remove this line if the css file doesn't exist
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
