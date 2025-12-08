@@ -1,0 +1,24 @@
+/* Basic styling for the authentication page */
+
+.auth-container {
+  max-width: 420px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.auth-footer {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}
