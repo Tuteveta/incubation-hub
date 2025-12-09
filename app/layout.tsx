@@ -1,4 +1,13 @@
 // app/layout.tsx
+
+import { Amplify } from 'aws-amplify';
+import config from '@/amplify_outputs.json';
+// OR if using Gen 2:
+// import outputs from '@/amplify_outputs.json';
+
+Amplify.configure(config);
+// OR for Gen 2:
+// Amplify.configure(outputs, { ssr: true });
 import type { Metadata } from "next";
 import "./globals.css";
 
