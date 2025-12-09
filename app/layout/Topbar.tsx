@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "aws-amplify/auth";
 import { 
   Search, 
   Bell, 
@@ -16,24 +16,20 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Topbar() {
-  const { user, signOut } = useAuthenticator();
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
   const handleSignOut = async () => {
     try {
-      if (typeof signOut === "function") {
-        await signOut();
-      }
+      await signOut();
+      window.location.href = "/auth";
     } catch (err) {
       console.error("Sign out failed:", err);
-    } finally {
-      router.push("/auth");
+      window.location.href = "/auth";
     }
   };
 
-  // Sample notifications (replace with real data)
   const notifications = [
     { id: 1, text: "New application submitted", time: "2m ago", unread: true },
     { id: 2, text: "Mentor session scheduled", time: "1h ago", unread: true },
@@ -64,17 +60,6 @@ export function Topbar() {
         .user-menu-item:hover {
           background-color: #f3f4f6;
           transform: translateX(4px);
-        }
-
-        .dropdown-enter {
-          opacity: 0;
-          transform: scale(0.95) translateY(-10px);
-        }
-
-        .dropdown-enter-active {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
       `}</style>
 
@@ -193,12 +178,10 @@ export function Topbar() {
                 className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                  {user?.username?.[0]?.toUpperCase() || 'U'}
+                  U
                 </div>
                 <div className="hidden md:block text-left">
-                  <div className="text-sm font-semibold text-gray-900">
-                    {user?.username || 'User'}
-                  </div>
+                  <div className="text-sm font-semibold text-gray-900">User</div>
                   <div className="text-xs text-gray-500">Founder</div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -217,15 +200,11 @@ export function Topbar() {
                     <div className="p-4 border-b border-gray-200 bg-gradient-to-br from-gray-50 to-blue-50">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                          {user?.username?.[0]?.toUpperCase() || 'U'}
+                          U
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-gray-900 truncate">
-                            {user?.username || 'User'}
-                          </div>
-                          <div className="text-sm text-gray-600 truncate">
-                            {user?.signInDetails?.loginId || 'user@example.com'}
-                          </div>
+                          <div className="font-semibold text-gray-900 truncate">User</div>
+                          <div className="text-sm text-gray-600 truncate">user@example.com</div>
                         </div>
                       </div>
                     </div>

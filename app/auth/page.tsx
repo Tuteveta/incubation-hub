@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Amplify } from "aws-amplify";
 import { signUp, signIn, confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import outputs from "@/amplify_outputs.json";
 
 type AuthMode = "signin" | "signup" | "verify";
 
@@ -19,6 +21,11 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Configure Amplify on mount
+  useEffect(() => {
+    Amplify.configure(outputs, { ssr: true });
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,11 +72,14 @@ export default function AuthPage() {
         password: password,
       });
       
-      router.push("/dashboard");
+      // Use window.location for immediate redirect
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 500);
+      
     } catch (err: any) {
-      setError(err.message || "Failed to verify code");
-    } finally {
       setLoading(false);
+      setError(err.message || "Failed to verify code");
     }
   };
 
@@ -93,21 +103,29 @@ export default function AuthPage() {
     setError("");
     
     try {
-      await signIn({
+      const result = await signIn({
         username: email,
         password: password,
       });
       
-      router.push("/dashboard");
+      console.log("Sign in successful:", result);
+      setSuccess("Sign in successful! Redirecting...");
+      
+      // Use window.location for immediate redirect
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 500);
+      
     } catch (err: any) {
+      setLoading(false);
       if (err.name === "UserNotConfirmedException") {
         setError("Please verify your email first. Check your inbox for the verification code.");
         setMode("verify");
+      } else if (err.name === "NotAuthorizedException") {
+        setError("Incorrect email or password. Please try again.");
       } else {
         setError(err.message || "Failed to sign in");
       }
-    } finally {
-      setLoading(false);
     }
   };
 

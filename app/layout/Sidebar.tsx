@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Menu, 
-  Home, 
   LayoutDashboard, 
   Briefcase, 
   GraduationCap, 
@@ -19,16 +18,15 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
-  { name: "Welcome", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Startups", href: "/startups", icon: Briefcase },
-  { name: "Programs", href: "/programs", icon: GraduationCap },
-  { name: "Mentorship", href: "/mentors", icon: Users },
+  { name: "Startups", href: "/dashboard/startups", icon: Briefcase },
+  { name: "Programs", href: "/dashboard/programs", icon: GraduationCap },
+  { name: "Mentorship", href: "/dashboard/mentorship", icon: Users },
 ];
 
 const secondaryItems = [
-  { name: "Settings", href: "/settings", icon: Settings },
-  { name: "Help & Support", href: "/help", icon: HelpCircle },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Help & Support", href: "/dashboard/help", icon: HelpCircle },
 ];
 
 export function Sidebar() {
