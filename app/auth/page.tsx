@@ -1,121 +1,118 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signUp, signIn, confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle } from "lucide-react";
 
-// Import from your existing Amplify setup
-// Adjust the import path if your project uses a different structure
-import { signIn, signUp, confirmSignUp, resetPassword } from 'aws-amplify/auth';
+type AuthMode = "signin" | "signup" | "verify";
 
 export default function AuthPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<AuthMode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
-    setSuccess("");
-    setIsLoading(true);
-
+    
     try {
-      if (isSignUp) {
-        // Sign up
-        const { isSignUpComplete, userId, nextStep } = await signUp({
-          username: email,
-          password,
-          options: {
-            userAttributes: {
-              email,
-            },
+      await signUp({
+        username: email,
+        password: password,
+        options: {
+          userAttributes: {
+            email: email,
+            name: name,
           },
-        });
-
-        console.log('Sign up result:', { isSignUpComplete, userId, nextStep });
-        
-        if (nextStep.signUpStep === 'CONFIRM_SIGN_UP') {
-          setSuccess("Account created! Please check your email for verification code.");
-          // You can add a verification code input here or redirect to verification page
-        } else if (nextStep.signUpStep === 'DONE') {
-          setSuccess("Account created successfully! You can now sign in.");
-          setIsSignUp(false);
-        }
-      } else {
-        // Sign in
-        const { isSignedIn, nextStep } = await signIn({
-          username: email,
-          password,
-        });
-
-        console.log('Sign in result:', { isSignedIn, nextStep });
-
-        if (isSignedIn) {
-          setSuccess("Sign in successful! Redirecting...");
-          setTimeout(() => {
-            router.push('/dashboard');
-          }, 1000);
-        } else {
-          // Handle MFA or other next steps
-          console.log('Next step:', nextStep);
-        }
-      }
+        },
+      });
+      
+      setSuccess("Account created! Please check your email for verification code.");
+      setMode("verify");
     } catch (err: any) {
-      console.error('Authentication error:', err);
-      
-      // User-friendly error messages
-      let errorMessage = "An error occurred. Please try again.";
-      
-      if (err.name === 'UserNotFoundException') {
-        errorMessage = "No account found with this email.";
-      } else if (err.name === 'NotAuthorizedException') {
-        errorMessage = "Incorrect email or password.";
-      } else if (err.name === 'UsernameExistsException') {
-        errorMessage = "An account with this email already exists.";
-      } else if (err.name === 'InvalidPasswordException') {
-        errorMessage = "Password must be at least 8 characters with uppercase, lowercase, and numbers.";
-      } else if (err.name === 'UserNotConfirmedException') {
-        errorMessage = "Please verify your email before signing in.";
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(errorMessage);
+      setError(err.message || "Failed to sign up");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError("Please enter your email address first.");
-      return;
-    }
-
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
     setError("");
-    setSuccess("");
-    setIsLoading(true);
-
+    
     try {
-      const output = await resetPassword({ username: email });
-      console.log('Reset password output:', output);
-      setSuccess("Password reset code sent to your email!");
+      await confirmSignUp({
+        username: email,
+        confirmationCode: verificationCode,
+      });
+      
+      setSuccess("Email verified! Signing you in...");
+      
+      // Auto sign in after verification
+      await signIn({
+        username: email,
+        password: password,
+      });
+      
+      router.push("/dashboard");
     } catch (err: any) {
-      console.error('Reset password error:', err);
-      setError(err.message || "Failed to send reset code.");
+      setError(err.message || "Failed to verify code");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setLoading(true);
+    setError("");
+    
+    try {
+      await resendSignUpCode({ username: email });
+      setSuccess("Verification code resent! Check your email.");
+    } catch (err: any) {
+      setError(err.message || "Failed to resend code");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    try {
+      await signIn({
+        username: email,
+        password: password,
+      });
+      
+      router.push("/dashboard");
+    } catch (err: any) {
+      if (err.name === "UserNotConfirmedException") {
+        setError("Please verify your email first. Check your inbox for the verification code.");
+        setMode("verify");
+      } else {
+        setError(err.message || "Failed to sign in");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
         
@@ -126,111 +123,57 @@ export default function AuthPage() {
         h1, h2, h3, h4, h5, h6 {
           font-family: 'Archivo', sans-serif;
         }
-
-        .btn-primary {
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
-          transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-          background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-          box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
-          transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .auth-card {
-          background: white;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-        }
-
-        .input-field {
-          transition: all 0.2s ease;
-        }
-
-        .input-field:focus {
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-          outline: none;
-        }
       `}</style>
 
-      {/* NAVIGATION */}
-      <nav className="border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-orange-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">Incubation Hub</span>
-            </Link>
-            
-            <Link href="/">
-              <Button variant="ghost" className="text-sm font-medium">
-                ← Back to home
-              </Button>
-            </Link>
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="space-y-2 text-center pb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-2">
+            <span className="text-2xl font-bold text-white">IH</span>
           </div>
-        </div>
-      </nav>
+          <CardTitle className="text-2xl font-bold">
+            {mode === "signin" && "Welcome Back"}
+            {mode === "signup" && "Create Account"}
+            {mode === "verify" && "Verify Email"}
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            {mode === "signin" && "Sign in to access your dashboard"}
+            {mode === "signup" && "Join Incubation Hub today"}
+            {mode === "verify" && "Enter the code sent to your email"}
+          </p>
+        </CardHeader>
 
-      {/* AUTH CONTENT */}
-      <div className="min-h-[calc(100vh-73px)] flex items-center justify-center px-6 py-12 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="w-full max-w-md">
-          {/* Auth Card */}
-          <div className="auth-card rounded-2xl p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {isSignUp ? "Create your account" : "Welcome back"}
-              </h1>
-              <p className="text-sm text-gray-600">
-                {isSignUp 
-                  ? "Start your startup journey today" 
-                  : "Sign in to continue to Incubation Hub"
-                }
-              </p>
+        <CardContent className="space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {error}
             </div>
+          )}
 
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
+          {/* Success Message */}
+          {success && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              {success}
+            </div>
+          )}
 
-            {/* Success Message */}
-            {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-green-600">{success}</p>
-              </div>
-            )}
-
-            {/* Sign In/Up Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+          {/* Sign In Form */}
+          {mode === "signin" && (
+            <form onSubmit={handleSignIn} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email address
+                  Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
-                    placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="you@example.com"
                     required
-                    disabled={isLoading}
-                    className="input-field w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-sm disabled:bg-gray-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -240,89 +183,206 @@ export default function AuthPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="password"
-                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="••••••••"
                     required
-                    minLength={8}
-                    disabled={isLoading}
-                    className="input-field w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-sm disabled:bg-gray-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {!isSignUp && (
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
-                      disabled={isLoading}
-                    />
-                    <span className="text-gray-600">Remember me</span>
-                  </label>
-                  <button 
-                    type="button" 
-                    onClick={handleForgotPassword}
-                    disabled={isLoading}
-                    className="text-blue-600 hover:underline font-medium disabled:opacity-50"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-                className="btn-primary text-white w-full py-3 font-semibold group"
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 group"
               >
-                {isLoading 
-                  ? (isSignUp ? "Creating account..." : "Signing in...") 
-                  : (isSignUp ? "Create account" : "Sign in")
-                }
-                {!isLoading && <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </Button>
             </form>
+          )}
 
-            {/* Toggle Sign In/Sign Up */}
-            <div className="text-center text-sm text-gray-600">
-              <p>
-                {isSignUp ? "Already have an account? " : "Don't have an account? "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSignUp(!isSignUp);
-                    setError("");
-                    setSuccess("");
-                  }}
-                  disabled={isLoading}
-                  className="text-blue-600 hover:underline font-medium disabled:opacity-50"
-                >
-                  {isSignUp ? "Sign in" : "Sign up"}
-                </button>
-              </p>
+          {/* Sign Up Form */}
+          {mode === "signup" && (
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="••••••••"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be at least 8 characters
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 group"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </Button>
+            </form>
+          )}
+
+          {/* Verification Form */}
+          {mode === "verify" && (
+            <form onSubmit={handleVerify} className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p className="text-sm text-blue-800 mb-1">
+                  Verification code sent to:
+                </p>
+                <p className="text-sm font-semibold text-blue-900">{email}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest font-semibold"
+                  placeholder="000000"
+                  required
+                  maxLength={6}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify Email"
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResendCode}
+                disabled={loading}
+                className="w-full"
+              >
+                Resend Code
+              </Button>
+            </form>
+          )}
+
+          {/* Toggle Mode */}
+          {mode !== "verify" && (
+            <div className="text-center pt-4 border-t">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "signin" ? "signup" : "signin");
+                  setError("");
+                  setSuccess("");
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {mode === "signin"
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Sign in"}
+              </button>
             </div>
+          )}
 
-            {/* Terms */}
-            {isSignUp && (
-              <p className="mt-6 text-xs text-center text-gray-500">
-                By creating an account, you agree to our{" "}
-                <Link href="/terms" className="text-blue-600 hover:underline">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="text-blue-600 hover:underline">
-                  Privacy Policy
-                </Link>
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+          {/* Back to Sign In from Verify */}
+          {mode === "verify" && (
+            <div className="text-center pt-4 border-t">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("signin");
+                  setError("");
+                  setSuccess("");
+                  setVerificationCode("");
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Back to Sign In
+              </button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
