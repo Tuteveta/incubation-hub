@@ -1,37 +1,32 @@
-// app/providers/Providers.tsx
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { Amplify } from "aws-amplify";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
+import { useEffect } from 'react';
+import { Amplify } from 'aws-amplify';
+import { Authenticator } from '@aws-amplify/ui-react';
+import outputs from '@/amplify_outputs.json';
 
-export default function Providers({ children }: { children?: React.ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const region = process.env.NEXT_PUBLIC_AWS_REGION;
-    const userPoolId = process.env.NEXT_PUBLIC_AWS_USER_POOL_ID;
-    const userPoolClientId = process.env.NEXT_PUBLIC_AWS_USER_POOL_CLIENT_ID;
-
-    if (!region || !userPoolId || !userPoolClientId) {
-      console.warn("Amplify missing env vars (client). Ensure .env.local has NEXT_PUBLIC_* keys.");
-      return;
+    try {
+      // Configure Amplify with Gen 2 outputs
+      Amplify.configure(outputs, { 
+        ssr: true 
+      });
+      
+      console.log('✅ Amplify configured successfully');
+      console.log('Auth config loaded:', {
+        userPoolId: outputs.auth.user_pool_id ? '✅ Present' : '❌ Missing',
+        region: outputs.auth.aws_region ? '✅ Present' : '❌ Missing',
+        clientId: outputs.auth.user_pool_client_id ? '✅ Present' : '❌ Missing'
+      });
+    } catch (error) {
+      console.error('❌ Error configuring Amplify:', error);
     }
-
-    const authConfig = {
-      Auth: {
-        region,
-        userPoolId,
-        userPoolWebClientId: userPoolClientId,
-      },
-    };
-
-    // Cast to any to avoid TS type mismatch errors while preserving runtime behavior
-    Amplify.configure(authConfig as any);
-
-    // dev-time diagnostic
-    // eslint-disable-next-line no-console
-    console.log("Amplify configured (client):", (Amplify as any)._config?.Auth);
   }, []);
 
-  return <Authenticator.Provider>{children}</Authenticator.Provider>;
+  return (
+    <Authenticator.Provider>
+      {children}
+    </Authenticator.Provider>
+  );
 }

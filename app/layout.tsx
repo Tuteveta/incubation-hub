@@ -1,26 +1,19 @@
-// app/layout.tsx
+'use client';
 
-import { Amplify } from 'aws-amplify';
-import config from '@/amplify_outputs.json';
-// OR if using Gen 2:
-// import outputs from '@/amplify_outputs.json';
+import Providers from './providers/Providers';
+import './globals.css';
 
-Amplify.configure(config);
-// OR for Gen 2:
-// Amplify.configure(outputs, { ssr: true });
-import type { Metadata } from "next";
-import "./globals.css";
-
-export const metadata: Metadata = {
-  title: "Incubation Hub",
-  description: "Startup incubation portal",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased">
-        {children}
+    <html lang="en">
+      <body>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
