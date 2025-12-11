@@ -175,7 +175,7 @@ export default function HomePage() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-orange-500 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Incubation Hub</span>
+              <span className="text-xl font-bold text-gray-900">PNG Incubation Hub</span>
             </div>
             
             <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
@@ -377,7 +377,7 @@ export default function HomePage() {
             
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/auth">
-                <Button className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-6 text-base font-semibold">
+                <Button variant="outline" className="text-black-600 hover:bg-blue-50 px-8 py-6 text-base font-semibold">
                   Create free account
                 </Button>
               </Link>
