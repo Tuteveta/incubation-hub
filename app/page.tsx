@@ -1,596 +1,1105 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Users, FolderOpen, TrendingUp, Sparkles, Shield, CheckCircle, Star, Globe, Rocket, Award } from "lucide-react";
+import {
+  Sparkles,
+  Play,
+  Users,
+  Video,
+  TrendingUp,
+  Star,
+  ArrowRight,
+  Check,
+  Globe,
+  Zap,
+  BookOpen,
+  DollarSign,
+  Share2,
+  BarChart3,
+  Award,
+  ChevronRight,
+  Menu,
+  X,
+  Youtube,
+  Instagram,
+  Twitter,
+  MessageCircle
+} from "lucide-react";
 
 export default function HomePage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const stats = [
+    { value: "10K+", label: "Active Creators", icon: Users },
+    { value: "500K+", label: "Students Learning", icon: BookOpen },
+    { value: "$5M+", label: "Creator Earnings", icon: DollarSign },
+    { value: "50K+", label: "Courses Published", icon: Video }
+  ];
+
+  const features = [
+    {
+      icon: Video,
+      title: "Create & Publish",
+      description: "Build beautiful courses with videos, PDFs, quizzes, and interactive content. Our intuitive editor makes creation effortless.",
+      color: "#8b5cf6"
+    },
+    {
+      icon: Share2,
+      title: "Cross-Platform Publishing",
+      description: "Distribute content to YouTube, Instagram, TikTok, LinkedIn, and more with one click. Reach your audience everywhere.",
+      color: "#3b82f6"
+    },
+    {
+      icon: Users,
+      title: "Student Management",
+      description: "Track student progress, manage cohorts, send announcements, and build a thriving learning community.",
+      color: "#10b981"
+    },
+    {
+      icon: DollarSign,
+      title: "Monetization",
+      description: "Set your own prices, manage subscriptions, and receive payments directly. Keep 100% of your earnings minus processing fees.",
+      color: "#f59e0b"
+    },
+    {
+      icon: BarChart3,
+      title: "Advanced Analytics",
+      description: "Understand your audience with detailed insights on engagement, revenue, completion rates, and growth trends.",
+      color: "#ef4444"
+    },
+    {
+      icon: Zap,
+      title: "AI-Powered Tools",
+      description: "Get smart recommendations, content suggestions, and automated insights to grow your creator business faster.",
+      color: "#ec4899"
+    }
+  ];
+
+  const pricingPlans = [
+    {
+      name: "Basic",
+      price: 29,
+      description: "Perfect for new creators getting started",
+      features: [
+        "Up to 50 students",
+        "10GB storage",
+        "Basic analytics",
+        "2 social platforms",
+        "Email support"
+      ],
+      color: "#64748b",
+      popular: false
+    },
+    {
+      name: "Standard",
+      price: 79,
+      description: "For growing creators building their audience",
+      features: [
+        "Up to 200 students",
+        "50GB storage",
+        "Advanced analytics",
+        "5 social platforms",
+        "Custom branding",
+        "Email campaigns",
+        "Priority support"
+      ],
+      color: "#8b5cf6",
+      popular: true
+    },
+    {
+      name: "Premium",
+      price: 199,
+      description: "For professional creators at scale",
+      features: [
+        "Unlimited students",
+        "200GB storage",
+        "AI-powered insights",
+        "All social platforms",
+        "Custom domain",
+        "Advanced automation",
+        "API access",
+        "Dedicated support"
+      ],
+      color: "#f59e0b",
+      popular: false
+    }
+  ];
+
+  const testimonials = [
+    {
+      quote: "CreatorHub transformed my teaching business. I went from scattered content across platforms to a unified, professional learning experience.",
+      author: "Sarah Chen",
+      role: "AI & ML Educator",
+      avatar: "SC",
+      color: "#8b5cf6",
+      students: "15K students"
+    },
+    {
+      quote: "The cross-posting feature alone saves me 10+ hours a week. Now I can focus on creating content instead of managing platforms.",
+      author: "Marcus Johnson",
+      role: "Fitness Coach",
+      avatar: "MJ",
+      color: "#3b82f6",
+      students: "8K students"
+    },
+    {
+      quote: "Finally, a platform that lets me keep 100% of my earnings. The analytics help me understand exactly what my students need.",
+      author: "Emily Rodriguez",
+      role: "Business Strategist",
+      avatar: "ER",
+      color: "#10b981",
+      students: "22K students"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: "100vh", background: "#0f172a" }}>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
-        
-        * {
-          font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-          font-family: 'Archivo', sans-serif;
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap');
+        * { font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; box-sizing: border-box; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Archivo', sans-serif; }
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(2deg); }
         }
-
         @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(37, 99, 235, 0.5); }
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
         }
-
-        .animate-fade-in-up {
-          animation: fadeInUp 0.6s ease-out forwards;
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
-
-        .animate-slide-in-left {
-          animation: slideInLeft 0.7s ease-out forwards;
-        }
-
-        .animate-scale-in {
-          animation: scaleIn 0.5s ease-out forwards;
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .hero-gradient {
-          background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 25%, #1e40af 50%, #2563eb 75%, #3b82f6 100%);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .hero-gradient::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: 
-            radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
-          pointer-events: none;
-        }
-
-        .hero-gradient::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-          pointer-events: none;
-          opacity: 0.5;
-        }
-
-        .card-hover {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card-hover:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-
-        .feature-card {
-          position: relative;
-          border: 1px solid #e5e7eb;
-          background: white;
-          overflow: hidden;
-        }
-
-        .feature-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #3b82f6, #fb923c);
-          transform: scaleX(0);
-          transform-origin: left;
-          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .feature-card:hover::before {
-          transform: scaleX(1);
-        }
-
-        .quick-panel {
-          background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-          border: 1px solid rgba(255,255,255,0.2);
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .icon-wrapper {
-          background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-          transition: all 0.3s ease;
-        }
-
-        .feature-card:hover .icon-wrapper {
-          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-          transform: scale(1.1);
-        }
-
-        .btn-primary {
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.4);
-          transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-          background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-          box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.5);
-          transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-          background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-          box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.4);
-          transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-          background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
-          box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.5);
-          transform: translateY(-2px);
-        }
-
-        .glass-card {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .testimonial-card {
-          background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-          border: 1px solid #e2e8f0;
-        }
-
-        .delay-100 { animation-delay: 0.1s; opacity: 0; }
-        .delay-200 { animation-delay: 0.2s; opacity: 0; }
-        .delay-300 { animation-delay: 0.3s; opacity: 0; }
-        .delay-400 { animation-delay: 0.4s; opacity: 0; }
-        .delay-500 { animation-delay: 0.5s; opacity: 0; }
       `}</style>
 
-      {/* TOP NAV - Simplified */}
-      <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold text-gray-900">PNG Incubation Hub</span>
-                <p className="text-xs text-gray-500 -mt-1">Empowering Founders</p>
-              </div>
+      {/* Navigation */}
+      <nav style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        background: scrolled ? "rgba(15, 23, 42, 0.95)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.1)" : "none",
+        transition: "all 0.3s ease"
+      }}>
+        <div style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          padding: "0 24px",
+          height: "80px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}>
+          {/* Logo */}
+          <Link href="/" style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            textDecoration: "none"
+          }}>
+            <div style={{
+              width: "44px",
+              height: "44px",
+              background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 32px rgba(139, 92, 246, 0.3)"
+            }}>
+              <Sparkles size={26} color="white" />
+            </div>
+            <span style={{
+              fontSize: "24px",
+              fontWeight: 800,
+              background: "linear-gradient(135deg, #fff, #94a3b8)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent"
+            }}>
+              CreatorHub
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "40px"
+          }} className="hidden md:flex">
+            {["Features", "Pricing", "Creators", "Resources"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                style={{
+                  color: "#94a3b8",
+                  textDecoration: "none",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  transition: "color 0.2s"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#fff"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#94a3b8"}
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <Link href="/auth" style={{
+              color: "#94a3b8",
+              textDecoration: "none",
+              fontSize: "15px",
+              fontWeight: 500,
+              padding: "10px 20px",
+              borderRadius: "10px",
+              transition: "all 0.2s"
+            }}>
+              Sign In
+            </Link>
+            <Link href="/auth" style={{
+              background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+              color: "white",
+              textDecoration: "none",
+              fontSize: "15px",
+              fontWeight: 600,
+              padding: "12px 24px",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              boxShadow: "0 8px 32px rgba(139, 92, 246, 0.3)",
+              transition: "transform 0.2s, box-shadow 0.2s"
+            }}>
+              Get Started <ArrowRight size={18} />
             </Link>
 
-            <div className="flex items-center gap-3">
-              <Link href="/auth">
-                <Button variant="ghost" className="text-sm font-semibold text-gray-700 hover:text-blue-600">
-                  Sign in
-                </Button>
-              </Link>
-              <Link href="/auth">
-                <Button className="btn-primary text-white text-sm font-semibold px-6 py-2">
-                  Get Started Free
-                </Button>
-              </Link>
-            </div>
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{
+                display: "none",
+                padding: "8px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer"
+              }}
+              className="md:hidden"
+            >
+              {mobileMenuOpen ? <X size={24} color="#fff" /> : <Menu size={24} color="#fff" />}
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <header className="hero-gradient text-white">
-        <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-sm font-medium animate-fade-in-up">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span>Trusted by 500+ startups in PNG & Pacific</span>
-              </div>
-
-              <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up delay-100">
-                Build Your Startup
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-300 via-amber-200 to-yellow-200">
-                  From Idea to Scale
-                </span>
-              </h1>
-
-              <p className="text-xl text-blue-100 leading-relaxed max-w-xl animate-fade-in-up delay-200">
-                The all-in-one platform to discover accelerator programs, connect with expert mentors, access resources, and track your startup journey.
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-4 animate-fade-in-up delay-300">
-                <Link href="/auth">
-                  <Button className="btn-secondary text-white px-8 py-6 text-base font-bold group">
-                    Start Free Today
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-
-                <Link href="/auth">
-                  <Button variant="outline" className="px-8 py-6 text-base font-semibold bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20">
-                    Watch Demo
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="flex items-center gap-6 pt-6 animate-fade-in-up delay-400">
-                <div className="flex -space-x-3">
-                  {["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"].map((color, idx) => (
-                    <div key={idx} style={{ backgroundColor: color }} className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                      {["JD", "SK", "ML", "AR", "TW"][idx]}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
-                  </div>
-                  <p className="text-sm text-blue-100">Loved by founders</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Panel */}
-            <div className="hidden lg:block animate-scale-in delay-200">
-              <div className="quick-panel rounded-3xl p-8 space-y-6 animate-float">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Your Dashboard Awaits</h3>
-                    <p className="text-sm text-gray-500">Everything you need in one place</p>
-                  </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {[
-                    { icon: FolderOpen, title: "12+ Programs", desc: "Curated accelerators & funding", color: "#3b82f6" },
-                    { icon: Users, title: "120+ Mentors", desc: "Industry experts ready to help", color: "#10b981" },
-                    { icon: TrendingUp, title: "Real-time Analytics", desc: "Track your startup growth", color: "#f59e0b" },
-                    { icon: Award, title: "$50M+ Raised", desc: "By our startup community", color: "#8b5cf6" }
-                  ].map((item, idx) => (
-                    <Link href="/auth" key={idx}>
-                      <div className="flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all group cursor-pointer border border-transparent hover:border-gray-200">
-                        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${item.color}15` }}>
-                          <item.icon className="w-6 h-6" style={{ color: item.color }} />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-bold text-gray-900 text-sm mb-1">{item.title}</div>
-                          <div className="text-xs text-gray-500">{item.desc}</div>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-
-                <Link href="/auth">
-                  <button className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-sm hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
-                    Access Your Dashboard →
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </div>
+      {/* Hero Section */}
+      <section style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "120px 24px 80px",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        {/* Animated Background */}
+        <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+          <div style={{
+            position: "absolute",
+            top: "-30%",
+            left: "-10%",
+            width: "700px",
+            height: "700px",
+            background: "radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 60%)",
+            borderRadius: "50%",
+            animation: "float 20s ease-in-out infinite"
+          }} />
+          <div style={{
+            position: "absolute",
+            bottom: "-30%",
+            right: "-10%",
+            width: "800px",
+            height: "800px",
+            background: "radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 60%)",
+            borderRadius: "50%",
+            animation: "float 25s ease-in-out infinite reverse"
+          }} />
+          <div style={{
+            position: "absolute",
+            top: "20%",
+            right: "20%",
+            width: "400px",
+            height: "400px",
+            background: "radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 60%)",
+            borderRadius: "50%",
+            animation: "float 15s ease-in-out infinite"
+          }} />
         </div>
 
-        {/* Stats Bar */}
-        <div className="border-t border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-6 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                { value: "500+", label: "Active Startups" },
-                { value: "120+", label: "Expert Mentors" },
-                { value: "$50M+", label: "Funds Raised" },
-                { value: "95%", label: "Success Rate" }
-              ].map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <div className="text-4xl font-extrabold text-white mb-1">{stat.value}</div>
-                  <div className="text-blue-200 text-sm">{stat.label}</div>
+        <div style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          textAlign: "center",
+          position: "relative",
+          zIndex: 10
+        }}>
+          {/* Badge */}
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 20px",
+            background: "rgba(139, 92, 246, 0.2)",
+            border: "1px solid rgba(139, 92, 246, 0.3)",
+            borderRadius: "100px",
+            marginBottom: "32px"
+          }}>
+            <Zap size={16} color="#8b5cf6" />
+            <span style={{ color: "#a78bfa", fontSize: "14px", fontWeight: 600 }}>
+              The #1 Platform for Content Creators
+            </span>
+          </div>
+
+          {/* Main Heading */}
+          <h1 style={{
+            fontSize: "clamp(40px, 8vw, 80px)",
+            fontWeight: 900,
+            color: "white",
+            lineHeight: 1.1,
+            marginBottom: "24px",
+            letterSpacing: "-0.02em"
+          }}>
+            Build, Monetize &{" "}
+            <span style={{
+              background: "linear-gradient(135deg, #8b5cf6, #3b82f6, #ec4899)",
+              backgroundSize: "200% 200%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              animation: "gradient-shift 5s ease infinite"
+            }}>
+              Scale
+            </span>
+            <br />
+            Your Creator Empire
+          </h1>
+
+          {/* Subheading */}
+          <p style={{
+            fontSize: "clamp(18px, 2.5vw, 22px)",
+            color: "#94a3b8",
+            maxWidth: "700px",
+            margin: "0 auto 48px",
+            lineHeight: 1.6
+          }}>
+            The all-in-one platform for content creators, coaches, and mentors to create courses, 
+            grow their audience, and monetize their expertise—while keeping 100% of their earnings.
+          </p>
+
+          {/* CTA Buttons */}
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            justifyContent: "center",
+            marginBottom: "64px"
+          }}>
+            <Link href="/auth" style={{
+              background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+              color: "white",
+              textDecoration: "none",
+              fontSize: "18px",
+              fontWeight: 600,
+              padding: "18px 36px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              boxShadow: "0 12px 40px rgba(139, 92, 246, 0.4)",
+              transition: "transform 0.2s, box-shadow 0.2s"
+            }}>
+              Start Creating Free <ArrowRight size={20} />
+            </Link>
+            <button style={{
+              background: "rgba(255, 255, 255, 0.1)",
+              color: "white",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              fontSize: "18px",
+              fontWeight: 600,
+              padding: "18px 36px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}>
+              <Play size={20} fill="white" /> Watch Demo
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: "32px",
+            maxWidth: "800px",
+            margin: "0 auto"
+          }}>
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} style={{ textAlign: "center" }}>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    marginBottom: "8px"
+                  }}>
+                    <Icon size={24} color="#8b5cf6" />
+                    <span style={{
+                      fontSize: "36px",
+                      fontWeight: 800,
+                      color: "white",
+                      fontFamily: "Archivo"
+                    }}>
+                      {stat.value}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: "14px", color: "#64748b" }}>{stat.label}</span>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* HOW IT WORKS */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full text-sm font-semibold text-blue-700 mb-4">
-              <Zap className="w-4 h-4" />
-              Simple 3-Step Process
+      {/* Features Section */}
+      <section id="features" style={{
+        padding: "120px 24px",
+        background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)"
+      }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          {/* Section Header */}
+          <div style={{ textAlign: "center", marginBottom: "80px" }}>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 20px",
+              background: "rgba(59, 130, 246, 0.2)",
+              border: "1px solid rgba(59, 130, 246, 0.3)",
+              borderRadius: "100px",
+              marginBottom: "24px"
+            }}>
+              <Star size={16} color="#3b82f6" />
+              <span style={{ color: "#60a5fa", fontSize: "14px", fontWeight: 600 }}>
+                Powerful Features
+              </span>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Get Started in Minutes
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 52px)",
+              fontWeight: 800,
+              color: "white",
+              marginBottom: "16px"
+            }}>
+              Everything You Need to Succeed
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Join thousands of founders who are building successful startups with our platform
+            <p style={{
+              fontSize: "18px",
+              color: "#94a3b8",
+              maxWidth: "600px",
+              margin: "0 auto"
+            }}>
+              From content creation to cross-platform distribution, we provide all the tools 
+              you need to build a thriving creator business.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                icon: CheckCircle,
-                title: "Create Your Account",
-                desc: "Sign up for free in seconds. No credit card required to get started.",
-                color: "#3b82f6"
-              },
-              {
-                step: "02",
-                icon: Globe,
-                title: "Explore & Apply",
-                desc: "Browse programs, connect with mentors, and access resources tailored to your needs.",
-                color: "#10b981"
-              },
-              {
-                step: "03",
-                icon: Rocket,
-                title: "Launch & Scale",
-                desc: "Get accepted, receive funding, and scale your startup with expert guidance.",
-                color: "#f59e0b"
-              }
-            ].map((item, idx) => (
-              <Link href="/auth" key={idx}>
-                <div className="relative bg-white rounded-2xl p-8 card-hover cursor-pointer border border-gray-200 group">
-                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg" style={{ backgroundColor: item.color }}>
-                    {item.step}
+          {/* Features Grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+            gap: "24px"
+          }}>
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.03)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    borderRadius: "20px",
+                    padding: "32px",
+                    transition: "all 0.3s ease",
+                    cursor: "default"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow = `0 20px 40px ${feature.color}20`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div style={{
+                    width: "56px",
+                    height: "56px",
+                    background: `${feature.color}20`,
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "20px"
+                  }}>
+                    <Icon size={28} color={feature.color} />
                   </div>
-                  <div className="pt-4">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: `${item.color}15` }}>
-                      <item.icon className="w-8 h-8" style={{ color: item.color }} />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                    <p className="text-gray-600">{item.desc}</p>
-                    <div className="mt-6 flex items-center text-sm font-semibold group-hover:gap-2 gap-1 transition-all" style={{ color: item.color }}>
-                      <span>Get started</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
+                  <h3 style={{
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    color: "white",
+                    marginBottom: "12px"
+                  }}>
+                    {feature.title}
+                  </h3>
+                  <p style={{
+                    fontSize: "15px",
+                    color: "#94a3b8",
+                    lineHeight: 1.7
+                  }}>
+                    {feature.description}
+                  </p>
                 </div>
-              </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Platforms Section */}
+      <section style={{
+        padding: "100px 24px",
+        background: "#0f172a"
+      }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{
+            fontSize: "clamp(28px, 4vw, 40px)",
+            fontWeight: 800,
+            color: "white",
+            marginBottom: "16px"
+          }}>
+            Publish Everywhere at Once
+          </h2>
+          <p style={{
+            fontSize: "18px",
+            color: "#94a3b8",
+            marginBottom: "48px",
+            maxWidth: "600px",
+            margin: "0 auto 48px"
+          }}>
+            Connect your social accounts and distribute content to all platforms with a single click.
+          </p>
+          
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "24px",
+            justifyContent: "center"
+          }}>
+            {[
+              { name: "YouTube", color: "#FF0000", icon: Youtube },
+              { name: "Instagram", color: "#E4405F", icon: Instagram },
+              { name: "TikTok", color: "#00F2EA", icon: Video },
+              { name: "LinkedIn", color: "#0A66C2", icon: Users },
+              { name: "Twitter/X", color: "#1DA1F2", icon: Twitter },
+              { name: "Facebook", color: "#1877F2", icon: Globe }
+            ].map((platform, index) => {
+              const Icon = platform.icon;
+              return (
+                <div
+                  key={index}
+                  style={{
+                    width: "140px",
+                    padding: "24px",
+                    background: "rgba(255, 255, 255, 0.03)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "12px",
+                    transition: "all 0.3s"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = platform.color;
+                    e.currentTarget.style.boxShadow = `0 0 30px ${platform.color}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <Icon size={32} color={platform.color} />
+                  <span style={{ color: "#94a3b8", fontSize: "14px", fontWeight: 500 }}>
+                    {platform.name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" style={{
+        padding: "120px 24px",
+        background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)"
+      }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 20px",
+              background: "rgba(245, 158, 11, 0.2)",
+              border: "1px solid rgba(245, 158, 11, 0.3)",
+              borderRadius: "100px",
+              marginBottom: "24px"
+            }}>
+              <DollarSign size={16} color="#f59e0b" />
+              <span style={{ color: "#fbbf24", fontSize: "14px", fontWeight: 600 }}>
+                Simple Pricing
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 52px)",
+              fontWeight: 800,
+              color: "white",
+              marginBottom: "16px"
+            }}>
+              Choose Your Plan
+            </h2>
+            <p style={{
+              fontSize: "18px",
+              color: "#94a3b8",
+              maxWidth: "500px",
+              margin: "0 auto"
+            }}>
+              Start free, upgrade as you grow. Cancel anytime.
+            </p>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "24px",
+            alignItems: "stretch"
+          }}>
+            {pricingPlans.map((plan, index) => (
+              <div
+                key={index}
+                style={{
+                  background: plan.popular 
+                    ? "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))"
+                    : "rgba(255, 255, 255, 0.03)",
+                  border: plan.popular
+                    ? "2px solid #8b5cf6"
+                    : "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "24px",
+                  padding: "40px",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+              >
+                {plan.popular && (
+                  <div style={{
+                    position: "absolute",
+                    top: "-14px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+                    padding: "8px 20px",
+                    borderRadius: "100px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "white"
+                  }}>
+                    Most Popular
+                  </div>
+                )}
+
+                <h3 style={{
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color: "white",
+                  marginBottom: "8px"
+                }}>
+                  {plan.name}
+                </h3>
+                <p style={{
+                  fontSize: "14px",
+                  color: "#94a3b8",
+                  marginBottom: "24px"
+                }}>
+                  {plan.description}
+                </p>
+
+                <div style={{ marginBottom: "32px" }}>
+                  <span style={{
+                    fontSize: "48px",
+                    fontWeight: 800,
+                    color: "white",
+                    fontFamily: "Archivo"
+                  }}>
+                    ${plan.price}
+                  </span>
+                  <span style={{ color: "#64748b", fontSize: "16px" }}>/month</span>
+                </div>
+
+                <ul style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "0 0 32px 0",
+                  flex: 1
+                }}>
+                  {plan.features.map((feature, i) => (
+                    <li key={i} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      marginBottom: "16px",
+                      color: "#e2e8f0",
+                      fontSize: "15px"
+                    }}>
+                      <Check size={18} color={plan.popular ? "#8b5cf6" : "#10b981"} />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href="/auth" style={{
+                  display: "block",
+                  textAlign: "center",
+                  padding: "16px 32px",
+                  background: plan.popular 
+                    ? "linear-gradient(135deg, #8b5cf6, #7c3aed)"
+                    : "rgba(255, 255, 255, 0.1)",
+                  border: plan.popular ? "none" : "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "12px",
+                  color: "white",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                  fontSize: "16px",
+                  transition: "all 0.2s"
+                }}>
+                  Get Started
+                </Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <main className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full text-sm font-semibold text-blue-700 mb-4">
-            Everything you need to succeed
+      {/* Testimonials Section */}
+      <section id="creators" style={{
+        padding: "120px 24px",
+        background: "#0f172a"
+      }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 20px",
+              background: "rgba(16, 185, 129, 0.2)",
+              border: "1px solid rgba(16, 185, 129, 0.3)",
+              borderRadius: "100px",
+              marginBottom: "24px"
+            }}>
+              <Award size={16} color="#10b981" />
+              <span style={{ color: "#34d399", fontSize: "14px", fontWeight: 600 }}>
+                Success Stories
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 52px)",
+              fontWeight: 800,
+              color: "white",
+              marginBottom: "16px"
+            }}>
+              Loved by Creators Worldwide
+            </h2>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Built for Ambitious Founders
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+            gap: "24px"
+          }}>
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                style={{
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  borderRadius: "20px",
+                  padding: "32px"
+                }}
+              >
+                <div style={{
+                  display: "flex",
+                  gap: "4px",
+                  marginBottom: "20px"
+                }}>
+                  {[1,2,3,4,5].map((star) => (
+                    <Star key={star} size={18} color="#f59e0b" fill="#f59e0b" />
+                  ))}
+                </div>
+                <p style={{
+                  fontSize: "17px",
+                  color: "#e2e8f0",
+                  lineHeight: 1.7,
+                  marginBottom: "24px"
+                }}>
+                  "{testimonial.quote}"
+                </p>
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "16px"
+                }}>
+                  <div style={{
+                    width: "48px",
+                    height: "48px",
+                    background: `linear-gradient(135deg, ${testimonial.color}, ${testimonial.color}aa)`,
+                    borderRadius: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    fontWeight: 700,
+                    fontSize: "16px"
+                  }}>
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <div style={{ color: "white", fontWeight: 600, marginBottom: "2px" }}>
+                      {testimonial.author}
+                    </div>
+                    <div style={{ color: "#64748b", fontSize: "14px" }}>
+                      {testimonial.role} • {testimonial.students}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section style={{
+        padding: "120px 24px",
+        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 60%)",
+          pointerEvents: "none"
+        }} />
+        
+        <div style={{
+          maxWidth: "800px",
+          margin: "0 auto",
+          textAlign: "center",
+          position: "relative",
+          zIndex: 10
+        }}>
+          <h2 style={{
+            fontSize: "clamp(36px, 6vw, 56px)",
+            fontWeight: 800,
+            color: "white",
+            marginBottom: "24px",
+            lineHeight: 1.2
+          }}>
+            Ready to Build Your<br />
+            Creator Empire?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            From application to acceleration, manage your entire startup journey in one integrated platform.
+          <p style={{
+            fontSize: "20px",
+            color: "#94a3b8",
+            marginBottom: "40px"
+          }}>
+            Join thousands of creators who are growing their audience and income with CreatorHub.
+          </p>
+          <Link href="/auth" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "12px",
+            background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+            color: "white",
+            textDecoration: "none",
+            fontSize: "20px",
+            fontWeight: 600,
+            padding: "20px 48px",
+            borderRadius: "16px",
+            boxShadow: "0 16px 48px rgba(139, 92, 246, 0.4)",
+            transition: "transform 0.2s"
+          }}>
+            Get Started for Free <ArrowRight size={24} />
+          </Link>
+          <p style={{
+            marginTop: "20px",
+            color: "#64748b",
+            fontSize: "14px"
+          }}>
+            No credit card required • Free 14-day trial
           </p>
         </div>
+      </section>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-          {[
-            {
-              icon: FolderOpen,
-              title: "Accelerator Programs",
-              desc: "Browse and apply to carefully curated programs matching your stage and industry. Get matched with the right opportunities.",
-              color: "#3b82f6"
-            },
-            {
-              icon: Users,
-              title: "Expert Mentorship",
-              desc: "Book 1-on-1 sessions with experienced founders, investors, and domain experts. Get actionable advice when you need it most.",
-              color: "#10b981"
-            },
-            {
-              icon: TrendingUp,
-              title: "Growth Analytics",
-              desc: "Track KPIs, milestones, and progress metrics. Visualize your journey from validation to product-market fit.",
-              color: "#8b5cf6"
-            },
-            {
-              icon: Sparkles,
-              title: "Resource Library",
-              desc: "Access templates, guides, and best practices. Learn from successful founders and avoid common pitfalls.",
-              color: "#f59e0b"
-            },
-            {
-              icon: Shield,
-              title: "Secure Platform",
-              desc: "Enterprise-grade security for your sensitive documents, pitch decks, and financial information.",
-              color: "#6b7280"
-            },
-            {
-              icon: Zap,
-              title: "Fast Application",
-              desc: "Apply to multiple programs with one profile. Save time with reusable forms and streamlined workflows.",
-              color: "#ec4899"
-            }
-          ].map((feature, idx) => (
-            <Link href="/auth" key={idx}>
-              <div className="feature-card card-hover rounded-2xl p-8 group cursor-pointer h-full">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6" style={{ backgroundColor: `${feature.color}15` }}>
-                  <feature.icon className="w-7 h-7" style={{ color: feature.color }} />
-                </div>
-                
-                <h4 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h4>
-                <p className="text-gray-600 leading-relaxed text-sm mb-6">{feature.desc}</p>
-                
-                <div className="flex items-center font-semibold text-sm group-hover:gap-2 gap-1 transition-all" style={{ color: feature.color }}>
-                  <span>Learn more</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-12 text-center text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent pointer-events-none"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-          
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm font-medium mb-6">
-              <Rocket className="w-4 h-4" />
-              Join 500+ founders today
-            </div>
-            
-            <h2 className="text-4xl font-bold mb-4">Ready to Build Something Great?</h2>
-            <p className="text-blue-100 mb-8 text-lg max-w-2xl mx-auto">
-              Join hundreds of founders who are building the next generation of companies. Start your journey today — it is completely free.
-            </p>
-            
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/auth">
-                <Button className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-6 text-base font-bold shadow-xl">
-                  Create Free Account
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link href="/auth">
-                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-base font-semibold">
-                  Schedule a Demo
-                </Button>
-              </Link>
-            </div>
-
-            <p className="text-blue-200 text-sm mt-6">
-              ✓ No credit card required &nbsp; ✓ Free forever plan &nbsp; ✓ Cancel anytime
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* FOOTER */}
-      <footer className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      {/* Footer */}
+      <footer style={{
+        padding: "64px 24px 32px",
+        background: "#0f172a",
+        borderTop: "1px solid rgba(255, 255, 255, 0.08)"
+      }}>
+        <div style={{
+          maxWidth: "1200px",
+          margin: "0 auto"
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "48px",
+            marginBottom: "64px"
+          }}>
             {/* Brand */}
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-6 h-6 text-white" />
+            <div>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px"
+              }}>
+                <div style={{
+                  width: "40px",
+                  height: "40px",
+                  background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <Sparkles size={22} color="white" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">PNG Incubation Hub</span>
+                <span style={{
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "white"
+                }}>
+                  CreatorHub
+                </span>
               </div>
-              <p className="text-gray-600 mb-6 max-w-md">
-                Empowering the next generation of founders in Papua New Guinea and the Pacific to build, scale, and succeed.
+              <p style={{
+                color: "#64748b",
+                fontSize: "14px",
+                lineHeight: 1.6
+              }}>
+                Empowering content creators to build, monetize, and scale their educational businesses.
               </p>
-              <div className="flex gap-4">
-                <Link href="/auth">
-                  <Button className="btn-primary text-white text-sm font-semibold px-6">
-                    Get Started
-                  </Button>
-                </Link>
-                <Link href="/auth">
-                  <Button variant="outline" className="text-sm font-semibold">
-                    Sign In
-                  </Button>
-                </Link>
+            </div>
+
+            {/* Links */}
+            {[
+              {
+                title: "Product",
+                links: ["Features", "Pricing", "Integrations", "API"]
+              },
+              {
+                title: "Company",
+                links: ["About", "Blog", "Careers", "Press"]
+              },
+              {
+                title: "Resources",
+                links: ["Documentation", "Help Center", "Community", "Contact"]
+              },
+              {
+                title: "Legal",
+                links: ["Privacy", "Terms", "Security", "Cookies"]
+              }
+            ].map((section, index) => (
+              <div key={index}>
+                <h4 style={{
+                  color: "white",
+                  fontWeight: 600,
+                  marginBottom: "16px",
+                  fontSize: "15px"
+                }}>
+                  {section.title}
+                </h4>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {section.links.map((link, i) => (
+                    <li key={i} style={{ marginBottom: "12px" }}>
+                      <a href="#" style={{
+                        color: "#64748b",
+                        textDecoration: "none",
+                        fontSize: "14px",
+                        transition: "color 0.2s"
+                      }}>
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h5 className="font-bold text-gray-900 mb-4">Quick Links</h5>
-              <ul className="space-y-3 text-gray-600">
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Programs</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Mentors</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Resources</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Dashboard</Link></li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h5 className="font-bold text-gray-900 mb-4">Legal</h5>
-              <ul className="space-y-3 text-gray-600">
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Terms of Service</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Cookie Policy</Link></li>
-                <li><Link href="/auth" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
-              </ul>
-            </div>
+            ))}
           </div>
 
-          <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-gray-500">
-              © {new Date().getFullYear()} PNG Incubation Hub. All rights reserved.
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-              </a>
+          {/* Bottom */}
+          <div style={{
+            paddingTop: "32px",
+            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px"
+          }}>
+            <p style={{ color: "#64748b", fontSize: "14px" }}>
+              © 2025 CreatorHub. All rights reserved.
+            </p>
+            <div style={{ display: "flex", gap: "20px" }}>
+              {[Twitter, Instagram, Youtube, MessageCircle].map((Icon, index) => (
+                <a key={index} href="#" style={{ color: "#64748b", transition: "color 0.2s" }}>
+                  <Icon size={20} />
+                </a>
+              ))}
             </div>
           </div>
         </div>
