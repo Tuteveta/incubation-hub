@@ -25,21 +25,8 @@ import {
   User
 } from "lucide-react";
 import { isAmplifyConfigured } from "../providers/AmplifyProvider";
-
-// Conditionally import Amplify UI components
-let Authenticator: any = null;
-let useAuthenticator: any = null;
-
-if (isAmplifyConfigured) {
-  try {
-    const amplifyUI = require("@aws-amplify/ui-react");
-    Authenticator = amplifyUI.Authenticator;
-    useAuthenticator = amplifyUI.useAuthenticator;
-    require("@aws-amplify/ui-react/styles.css");
-  } catch (e) {
-    console.log("Amplify UI not available, using demo mode");
-  }
-}
+import { Authenticator, useAuthenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
 
 // Role Selection Component
 function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: string) => void }) {
@@ -383,35 +370,62 @@ function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: string) => void 
   );
 }
 
-// Auth Redirect Component
-function AuthRedirect({ role }: { role: string }) {
+// Auth Redirect Component - Only used when Amplify is configured
+function AmplifyAuthRedirect({ role }: { role: string }) {
   const router = useRouter();
-  
-  // In demo mode, this won't be called since we handle redirect in DemoAuthForm
-  if (!isAmplifyConfigured || !useAuthenticator) {
-    return null;
-  }
-  
-  const { authStatus } = useAuthenticator();
+  const { authStatus, user } = useAuthenticator((context) => [context.authStatus, context.user]);
 
   useEffect(() => {
+    console.log("Auth status:", authStatus, "Role:", role, "User:", user?.username);
+    
     if (authStatus === "authenticated") {
-      // Redirect based on role
-      switch (role) {
-        case "admin":
-          router.push("/admin");
-          break;
-        case "creator":
-          router.push("/creator");
-          break;
-        case "student":
-          router.push("/student");
-          break;
-        default:
-          router.push("/dashboard");
-      }
+      // Small delay to ensure auth state is fully settled
+      const timer = setTimeout(() => {
+        switch (role) {
+          case "admin":
+            router.push("/admin");
+            break;
+          case "creator":
+            router.push("/creator");
+            break;
+          case "student":
+            router.push("/student");
+            break;
+          default:
+            router.push("/");
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
-  }, [authStatus, role, router]);
+  }, [authStatus, role, router, user]);
+
+  // Show loading state while redirecting
+  if (authStatus === "authenticated") {
+    return (
+      <div style={{ 
+        textAlign: "center", 
+        padding: "40px",
+        color: "#6b7280"
+      }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          border: "3px solid #e5e7eb",
+          borderTopColor: "#8b5cf6",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+          margin: "0 auto 16px"
+        }} />
+        <p>Redirecting to dashboard...</p>
+        <style jsx>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return null;
 }
@@ -1037,7 +1051,7 @@ function AuthForm({ role, onBack }: { role: string; onBack: () => void }) {
         </div>
 
         {/* Auth Form - Demo or Amplify */}
-        {isAmplifyConfigured && Authenticator ? (
+        {isAmplifyConfigured ? (
           <Authenticator
             initialState="signIn"
             components={{
@@ -1067,14 +1081,14 @@ function AuthForm({ role, onBack }: { role: string; onBack: () => void }) {
               }
             }}
           >
-            {() => <AuthRedirect role={role} />}
+            {() => <AmplifyAuthRedirect role={role} />}
           </Authenticator>
         ) : (
           <DemoAuthForm role={role} config={config} onBack={onBack} />
         )}
 
         {/* Footer Links - Only show for Amplify mode */}
-        {isAmplifyConfigured && Authenticator && (
+        {isAmplifyConfigured && (
           <div style={{
             marginTop: "32px",
             textAlign: "center"
