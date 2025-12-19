@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Authenticator, useAuthenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 import {
   Sparkles,
   Users,
@@ -19,8 +17,29 @@ import {
   Star,
   Zap,
   Target,
-  Award
+  Award,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User
 } from "lucide-react";
+import { isAmplifyConfigured } from "../providers/AmplifyProvider";
+
+// Conditionally import Amplify UI components
+let Authenticator: any = null;
+let useAuthenticator: any = null;
+
+if (isAmplifyConfigured) {
+  try {
+    const amplifyUI = require("@aws-amplify/ui-react");
+    Authenticator = amplifyUI.Authenticator;
+    useAuthenticator = amplifyUI.useAuthenticator;
+    require("@aws-amplify/ui-react/styles.css");
+  } catch (e) {
+    console.log("Amplify UI not available, using demo mode");
+  }
+}
 
 // Role Selection Component
 function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: string) => void }) {
@@ -366,8 +385,14 @@ function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: string) => void 
 
 // Auth Redirect Component
 function AuthRedirect({ role }: { role: string }) {
-  const { authStatus } = useAuthenticator();
   const router = useRouter();
+  
+  // In demo mode, this won't be called since we handle redirect in DemoAuthForm
+  if (!isAmplifyConfigured || !useAuthenticator) {
+    return null;
+  }
+  
+  const { authStatus } = useAuthenticator();
 
   useEffect(() => {
     if (authStatus === "authenticated") {
@@ -389,6 +414,282 @@ function AuthRedirect({ role }: { role: string }) {
   }, [authStatus, role, router]);
 
   return null;
+}
+
+// Demo Auth Form for when AWS Cognito is not configured
+function DemoAuthForm({ role, config, onBack }: { role: string; config: any; onBack: () => void }) {
+  const router = useRouter();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: ""
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulate auth delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Store demo session
+    localStorage.setItem("demo_auth", JSON.stringify({ 
+      role, 
+      email: formData.email,
+      name: formData.name || formData.email.split("@")[0]
+    }));
+    
+    // Redirect based on role
+    switch (role) {
+      case "admin":
+        router.push("/admin");
+        break;
+      case "creator":
+        router.push("/creator");
+        break;
+      case "student":
+        router.push("/student");
+        break;
+      default:
+        router.push("/");
+    }
+  };
+
+  const Icon = config.icon;
+
+  return (
+    <div style={{
+      width: "100%",
+      maxWidth: "400px",
+      background: "white",
+      borderRadius: "20px",
+      padding: "40px",
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+    }}>
+      {/* Demo Mode Banner */}
+      <div style={{
+        background: "#fef3c7",
+        border: "1px solid #f59e0b",
+        borderRadius: "8px",
+        padding: "12px 16px",
+        marginBottom: "24px",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px"
+      }}>
+        <Zap size={16} color="#d97706" />
+        <span style={{ fontSize: "13px", color: "#92400e" }}>
+          <strong>Demo Mode:</strong> No AWS credentials configured. Using local auth.
+        </span>
+      </div>
+
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "24px" }}>
+        <div style={{
+          width: "56px",
+          height: "56px",
+          background: `linear-gradient(135deg, ${config.color}, ${config.color}aa)`,
+          borderRadius: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "0 auto 16px"
+        }}>
+          <Icon size={28} color="white" />
+        </div>
+        <h2 style={{
+          fontSize: "24px",
+          fontWeight: 700,
+          color: "#0f172a",
+          marginBottom: "8px",
+          fontFamily: "Archivo"
+        }}>
+          {isSignUp ? "Create Account" : "Welcome Back"}
+        </h2>
+        <p style={{ fontSize: "14px", color: "#64748b" }}>
+          {isSignUp ? `Sign up as a ${config.title}` : `Sign in to your ${config.title}`}
+        </p>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        {isSignUp && (
+          <div>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#374151", marginBottom: "6px" }}>
+              Full Name
+            </label>
+            <div style={{ position: "relative" }}>
+              <User size={18} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }} />
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="John Doe"
+                style={{
+                  width: "100%",
+                  padding: "12px 12px 12px 42px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "10px",
+                  fontSize: "14px",
+                  outline: "none",
+                  transition: "border-color 0.2s",
+                  boxSizing: "border-box"
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#374151", marginBottom: "6px" }}>
+            Email Address
+          </label>
+          <div style={{ position: "relative" }}>
+            <Mail size={18} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }} />
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="you@example.com"
+              required
+              style={{
+                width: "100%",
+                padding: "12px 12px 12px 42px",
+                border: "1px solid #e5e7eb",
+                borderRadius: "10px",
+                fontSize: "14px",
+                outline: "none",
+                transition: "border-color 0.2s",
+                boxSizing: "border-box"
+              }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#374151", marginBottom: "6px" }}>
+            Password
+          </label>
+          <div style={{ position: "relative" }}>
+            <Lock size={18} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }} />
+            <input
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="••••••••"
+              required
+              style={{
+                width: "100%",
+                padding: "12px 42px 12px 42px",
+                border: "1px solid #e5e7eb",
+                borderRadius: "10px",
+                fontSize: "14px",
+                outline: "none",
+                transition: "border-color 0.2s",
+                boxSizing: "border-box"
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#9ca3af"
+              }}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            width: "100%",
+            padding: "14px",
+            background: `linear-gradient(135deg, ${config.color}, ${config.color}dd)`,
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            fontSize: "15px",
+            fontWeight: 600,
+            cursor: isLoading ? "not-allowed" : "pointer",
+            opacity: isLoading ? 0.7 : 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            marginTop: "8px"
+          }}
+        >
+          {isLoading ? (
+            <>
+              <div style={{
+                width: "18px",
+                height: "18px",
+                border: "2px solid white",
+                borderTopColor: "transparent",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
+              }} />
+              {isSignUp ? "Creating Account..." : "Signing In..."}
+            </>
+          ) : (
+            <>
+              {isSignUp ? "Create Account" : "Sign In"}
+              <ArrowRight size={18} />
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Toggle Sign In/Up */}
+      <p style={{ textAlign: "center", marginTop: "24px", fontSize: "14px", color: "#64748b" }}>
+        {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+        <button
+          onClick={() => setIsSignUp(!isSignUp)}
+          style={{
+            background: "none",
+            border: "none",
+            color: config.color,
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          {isSignUp ? "Sign In" : "Sign Up"}
+        </button>
+      </p>
+
+      {/* Footer */}
+      <p style={{
+        textAlign: "center",
+        marginTop: "24px",
+        fontSize: "13px",
+        color: "#94a3b8"
+      }}>
+        By continuing, you agree to our{" "}
+        <a href="/terms" style={{ color: config.color }}>Terms</a>
+        {" "}and{" "}
+        <a href="/privacy" style={{ color: config.color }}>Privacy Policy</a>
+      </p>
+
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 // Main Auth Form Component
@@ -735,54 +1036,60 @@ function AuthForm({ role, onBack }: { role: string; onBack: () => void }) {
           </span>
         </div>
 
-        {/* Authenticator */}
-        <Authenticator
-          initialState="signIn"
-          components={{
-            Header() {
-              return (
-                <div style={{
-                  textAlign: "center",
-                  marginBottom: "24px"
-                }}>
-                  <h2 style={{
-                    fontSize: "24px",
-                    fontWeight: 700,
-                    color: "#0f172a",
-                    marginBottom: "8px",
-                    fontFamily: "Archivo"
+        {/* Auth Form - Demo or Amplify */}
+        {isAmplifyConfigured && Authenticator ? (
+          <Authenticator
+            initialState="signIn"
+            components={{
+              Header() {
+                return (
+                  <div style={{
+                    textAlign: "center",
+                    marginBottom: "24px"
                   }}>
-                    {config.title}
-                  </h2>
-                  <p style={{
-                    fontSize: "14px",
-                    color: "#64748b"
-                  }}>
-                    {config.subtitle}
-                  </p>
-                </div>
-              );
-            }
-          }}
-        >
-          {() => <AuthRedirect role={role} />}
-        </Authenticator>
+                    <h2 style={{
+                      fontSize: "24px",
+                      fontWeight: 700,
+                      color: "#0f172a",
+                      marginBottom: "8px",
+                      fontFamily: "Archivo"
+                    }}>
+                      {config.title}
+                    </h2>
+                    <p style={{
+                      fontSize: "14px",
+                      color: "#64748b"
+                    }}>
+                      {config.subtitle}
+                    </p>
+                  </div>
+                );
+              }
+            }}
+          >
+            {() => <AuthRedirect role={role} />}
+          </Authenticator>
+        ) : (
+          <DemoAuthForm role={role} config={config} onBack={onBack} />
+        )}
 
-        {/* Footer Links */}
-        <div style={{
-          marginTop: "32px",
-          textAlign: "center"
-        }}>
-          <p style={{
-            fontSize: "13px",
-            color: "#64748b"
+        {/* Footer Links - Only show for Amplify mode */}
+        {isAmplifyConfigured && Authenticator && (
+          <div style={{
+            marginTop: "32px",
+            textAlign: "center"
           }}>
-            By continuing, you agree to our{" "}
-            <a href="/terms" style={{ color: config.color }}>Terms</a>
-            {" "}and{" "}
-            <a href="/privacy" style={{ color: config.color }}>Privacy Policy</a>
-          </p>
-        </div>
+            <p style={{
+              fontSize: "13px",
+              color: "#64748b"
+            }}>
+              By continuing, you agree to our{" "}
+              <a href="/terms" style={{ color: config.color }}>Terms</a>
+              {" "}and{" "}
+              <a href="/privacy" style={{ color: config.color }}>Privacy Policy</a>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

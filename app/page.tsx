@@ -1039,19 +1039,39 @@ export default function HomePage() {
             {[
               {
                 title: "Product",
-                links: ["Features", "Pricing", "Integrations", "API"]
+                links: [
+                  { name: "Features", href: "#features" },
+                  { name: "Pricing", href: "#pricing" },
+                  { name: "Integrations", href: "#" },
+                  { name: "API", href: "#" }
+                ]
               },
               {
                 title: "Company",
-                links: ["About", "Blog", "Careers", "Press"]
+                links: [
+                  { name: "About", href: "#" },
+                  { name: "Blog", href: "#" },
+                  { name: "Careers", href: "#" },
+                  { name: "Press", href: "#" }
+                ]
               },
               {
                 title: "Resources",
-                links: ["Documentation", "Help Center", "Community", "Contact"]
+                links: [
+                  { name: "Documentation", href: "#" },
+                  { name: "Help Center", href: "#" },
+                  { name: "Community", href: "#" },
+                  { name: "Contact", href: "#" }
+                ]
               },
               {
                 title: "Legal",
-                links: ["Privacy", "Terms", "Security", "Cookies"]
+                links: [
+                  { name: "Privacy", href: "/privacy" },
+                  { name: "Terms", href: "/terms" },
+                  { name: "Security", href: "#" },
+                  { name: "Cookies", href: "#" }
+                ]
               }
             ].map((section, index) => (
               <div key={index}>
@@ -1066,14 +1086,14 @@ export default function HomePage() {
                 <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                   {section.links.map((link, i) => (
                     <li key={i} style={{ marginBottom: "12px" }}>
-                      <a href="#" style={{
+                      <Link href={link.href} style={{
                         color: "#64748b",
                         textDecoration: "none",
                         fontSize: "14px",
                         transition: "color 0.2s"
                       }}>
-                        {link}
-                      </a>
+                        {link.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
